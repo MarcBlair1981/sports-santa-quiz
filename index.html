@@ -694,50 +694,9 @@ footer span{color:rgba(255,255,255,0.35);}
   </div>
 </div>
 
+<script src="data.js"></script>
 <script>
-/* ===================================================
-   GAME DATA – 25 days of sports puzzles
-   Images cycle through 8 generated photos
-   In production each day gets a unique real photo
-=================================================== */
-const IMAGES = {
-  boxer:      'img_boxer.png',
-  f1:         'img_f1.png',
-  golfer:     'img_golfer.png',
-  athlete:    'img_athlete.png',
-  rugby:      'img_rugby.png',
-  swimmer:    'img_swimmer.png',
-  basketball: 'img_basketball.png',
-  snooker:    'img_snooker.png',
-};
-
-const DAYS = [
-  { day:1,  img:'boxer',      sport:'Boxing 🥊',      correct:'Anthony Joshua',    wrong:['Tyson Fury','David Haye'],       hint:'British heavyweight world champion, Olympic gold medallist' },
-  { day:2,  img:'f1',         sport:'Formula 1 🏎️',   correct:'Lewis Hamilton',    wrong:['Max Verstappen','Nico Rosberg'], hint:'7-time Formula 1 world champion' },
-  { day:3,  img:'golfer',     sport:'Golf ⛳',         correct:'Rory McIlroy',      wrong:['Tiger Woods','Jon Rahm'],        hint:'Northern Irish golfer, 4 major titles' },
-  { day:4,  img:'athlete',    sport:'Athletics 🏃',    correct:'Usain Bolt',        wrong:['Mo Farah','Yohan Blake'],        hint:'The fastest man in history, triple Olympic champion' },
-  { day:5,  img:'rugby',      sport:'Rugby Union 🏉',  correct:'Jonny Wilkinson',   wrong:['Martin Johnson','Lawrence Dallaglio'], hint:'Drop-kicked England to World Cup glory in 2003' },
-  { day:6,  img:'swimmer',    sport:'Swimming 🏊',     correct:'Michael Phelps',    wrong:['Adam Peaty','Ian Thorpe'],       hint:'Most decorated Olympian of all time with 23 gold medals' },
-  { day:7,  img:'basketball', sport:'Basketball 🏀',   correct:'LeBron James',      wrong:['Michael Jordan','Kevin Durant'], hint:'The King – 4-time NBA champion' },
-  { day:8,  img:'snooker',    sport:'Snooker 🎱',      correct:'Ronnie O\'Sullivan', wrong:['Mark Selby','Judd Trump'],      hint:'The Rocket – 7-time World Snooker Champion' },
-  { day:9,  img:'f1',         sport:'Formula 1 🏎️',   correct:'Max Verstappen',    wrong:['Lewis Hamilton','Charles Leclerc'], hint:'Dutch sensation, youngest ever F1 champion' },
-  { day:10, img:'boxer',      sport:'Boxing 🥊',       correct:'Tyson Fury',        wrong:['Anthony Joshua','Oleksandr Usyk'], hint:'The Gypsy King – WBC heavyweight champion from Manchester' },
-  { day:11, img:'golfer',     sport:'Golf ⛳',         correct:'Tiger Woods',       wrong:['Rory McIlroy','Phil Mickelson'], hint:'15-time major champion who changed golf forever' },
-  { day:12, img:'athlete',    sport:'Athletics 🏃',    correct:'Mo Farah',          wrong:['Usain Bolt','Colin Jackson'],    hint:'British double Olympic champion at 5,000m and 10,000m' },
-  { day:13, img:'rugby',      sport:'Rugby Union 🏉',  correct:'Martin Johnson',    wrong:['Jonny Wilkinson','Will Carling'], hint:'England captain who lifted the Webb Ellis Cup in 2003' },
-  { day:14, img:'swimmer',    sport:'Swimming 🏊',     correct:'Adam Peaty',        wrong:['Michael Phelps','Tom Dean'],    hint:'British backstroke and breaststroke star, world record holder' },
-  { day:15, img:'basketball', sport:'Basketball 🏀',   correct:'Michael Jordan',    wrong:['LeBron James','Kobe Bryant'],   hint:'His Airness – 6 NBA titles, 6 Finals MVPs' },
-  { day:16, img:'snooker',    sport:'Snooker 🎱',      correct:'Judd Trump',        wrong:['Ronnie O\'Sullivan','Neil Robertson'], hint:'Bristol-born world champion known for his attacking play' },
-  { day:17, img:'boxer',      sport:'Boxing 🥊',       correct:'David Haye',        wrong:['Tyson Fury','Lennox Lewis'],    hint:'The Hayemaker – unified cruiserweight and WBA heavyweight world champion' },
-  { day:18, img:'f1',         sport:'Formula 1 🏎️',   correct:'Sebastian Vettel',  wrong:['Max Verstappen','Kimi Räikkönen'], hint:'4-time consecutive world champion with Red Bull Racing' },
-  { day:19, img:'golfer',     sport:'Golf ⛳',         correct:'Phil Mickelson',    wrong:['Tiger Woods','Dustin Johnson'], hint:'Lefty – 6 major championships including 3 Masters titles' },
-  { day:20, img:'athlete',    sport:'Athletics 🏃',    correct:'Colin Jackson',     wrong:['Mo Farah','Linford Christie'], hint:'Welsh sprinter and world record holder in 110m hurdles' },
-  { day:21, img:'rugby',      sport:'Rugby Union 🏉',  correct:'Brian O\'Driscoll', wrong:['Martin Johnson','Paul O\'Connell'], hint:'Ireland\'s greatest ever player, British Lions legend' },
-  { day:22, img:'swimmer',    sport:'Swimming 🏊',     correct:'Ian Thorpe',        wrong:['Michael Phelps','Grant Hackett'], hint:'The Thorpedo – Australian 5-time Olympic gold medallist' },
-  { day:23, img:'basketball', sport:'Basketball 🏀',   correct:'Stephen Curry',     wrong:['LeBron James','Kevin Durant'],  hint:'Golden State sharpshooter who revolutionised the three-point shot' },
-  { day:24, img:'snooker',    sport:'Snooker 🎱',      correct:'Mark Selby',        wrong:['Ronnie O\'Sullivan','John Higgins'], hint:'The Jester from Leicester – 4-time World Snooker Champion' },
-  { day:25, img:'boxer',      sport:'Boxing 🥊',       correct:'Lennox Lewis',      wrong:['Evander Holyfield','Riddick Bowe'], hint:'British-Canadian legend – undisputed heavyweight champion of the world' },
-];
+/* DAYS and game data loaded from data.js — edit that file to change questions & photos */
 
 /* Shuffle wrong answers for randomness */
 function buildChoices(d) {
@@ -828,7 +787,7 @@ function buildGrid() {
           <div class="door-date-label">Dec ${d.day}</div>
         </div>
         <div class="door-back">
-          <img src="${IMAGES[d.img]}" alt="Sports person day ${d.day}" loading="lazy"/>
+          <img src="${d.img}" alt="Sports person day ${d.day}" loading="lazy"/>
         </div>
       </div>
       <div class="door-result-badge">${result === 'correct' ? '✅' : result ? '❌' : ''}</div>
@@ -877,7 +836,7 @@ function showModal(d) {
   choicesDiv.innerHTML = '';
 
   // Populate
-  img.src = IMAGES[d.img];
+  img.src = d.img;
   dayLbl.textContent = `Day ${d.day}`;
   sportTag.textContent = `🎄 Day ${d.day} · ${d.sport}`;
   question.innerHTML = `Who is the <em>mystery sports star</em> hiding behind the Santa disguise?`;
