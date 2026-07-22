@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sports Santa – The Festive Sports Quiz | Free to Play</title>
+<meta name="description" content="Guess the sports star dressed as Santa! Open each door of the advent calendar and identify the legendary athlete in 5 seconds. Free-to-play festive sports quiz."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Outfit',sans-serif;
+  background:#0a0a14;
+  color:#f0f0f0;
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ===== SNOW CANVAS ===== */
+#snow-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;opacity:0.6;
+}
+
+/* ===== BACKGROUND ===== */
+.bg-gradient{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(180,20,20,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(212,160,20,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(20,80,40,0.14) 0%, transparent 60%),
+    linear-gradient(160deg, #070710 0%, #0d0d1f 50%, #0a100a 100%);
+  z-index:0;
+}
+
+/* ===== WRAPPER ===== */
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
+
+/* ===== HEADER ===== */
+header{
+  text-align:center;
+  padding:36px 20px 20px;
+  position:relative;
+}
+.brand-badge{
+  display:inline-block;
+  background:linear-gradient(135deg,#c8102e,#8b0000);
+  color:#fff;
+  font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  padding:5px 16px;border-radius:100px;margin-bottom:14px;
+  border:1px solid rgba(255,255,255,0.15);
+}
+header h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.8rem);
+  font-weight:900;
+  line-height:1.1;
+  background:linear-gradient(135deg,#fff 0%,#ffd700 40%,#ff6b35 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-shadow:none;
+  margin-bottom:8px;
+}
+header h1 span{color:#c8102e;-webkit-text-fill-color:#c8102e;}
+.tagline{
+  font-size:clamp(0.85rem,2vw,1.05rem);
+  color:rgba(255,255,255,0.5);
+  letter-spacing:1px;
+  font-weight:300;
+}
+.snowflake-row{
+  font-size:1.4rem;letter-spacing:6px;margin-top:12px;
+  animation:sway 3s ease-in-out infinite alternate;
+}
+@keyframes sway{from{letter-spacing:4px}to{letter-spacing:10px}}
+
+/* ===== SCOREBOARD ===== */
+.scoreboard{
+  display:flex;justify-content:center;gap:16px;
+  padding:0 20px 24px;
+  flex-wrap:wrap;
+}
+.score-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:14px 24px;
+  text-align:center;
+  backdrop-filter:blur(12px);
+  min-width:110px;
+  transition:transform 0.2s,border-color 0.2s;
+}
+.score-card:hover{transform:translateY(-2px);border-color:rgba(255,215,0,0.3);}
+.score-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px;}
+.score-value{font-size:1.8rem;font-weight:800;color:#ffd700;}
+.score-value.green{color:#4caf50;}
+.score-value.red{color:#c8102e;}
+.score-value.streak{color:#ff9800;}
+
+/* ===== CALENDAR GRID ===== */
+.calendar-container{
+  flex:1;
+  padding:0 16px 40px;
+  max-width:1100px;
+  margin:0 auto;
+  width:100%;
+}
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+}
+@media(max-width:700px){
+  .calendar-grid{grid-template-columns:repeat(4,1fr);gap:8px;}
+}
+@media(max-width:480px){
+  .calendar-grid{grid-template-columns:repeat(3,1fr);gap:6px;}
+}
+
+/* ===== DOOR CARD ===== */
+.door{
+  aspect-ratio:3/4;
+  perspective:800px;
+  cursor:pointer;
+  position:relative;
+}
+.door.locked{cursor:not-allowed;}
+.door.opened{cursor:default;}
+
+.door-inner{
+  width:100%;height:100%;
+  transform-style:preserve-3d;
+  transition:transform 0.7s cubic-bezier(0.4,0.2,0.2,1);
+  position:relative;border-radius:16px;
+}
+.door.flipped .door-inner{transform:rotateY(180deg);}
+
+.door-front,.door-back{
+  position:absolute;width:100%;height:100%;
+  border-radius:16px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+/* FRONT – the numbered door */
+.door-front{
+  background:linear-gradient(145deg,#1a0a0a,#2d1010);
+  border:1px solid rgba(200,16,46,0.35);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05);
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+.door:not(.locked):not(.opened) .door-front:hover{
+  border-color:rgba(255,215,0,0.6);
+  box-shadow:0 8px 30px rgba(200,16,46,0.3),inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.door.locked .door-front{
+  background:linear-gradient(145deg,#111118,#181828);
+  border-color:rgba(100,100,140,0.2);
+}
+.door-number{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.6rem,4vw,2.8rem);
+  font-weight:900;
+  color:#c8102e;
+  text-shadow:0 0 20px rgba(200,16,46,0.5);
+  line-height:1;
+}
+.door.locked .door-number{color:rgba(100,100,140,0.4);text-shadow:none;}
+.door-emoji{font-size:clamp(1rem,2.5vw,1.6rem);margin-top:6px;opacity:0.8;}
+.door.locked .door-emoji{opacity:0.2;}
+.door-date-label{
+  font-size:clamp(7px,1.2vw,10px);
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(200,100,100,0.7);
+  margin-top:4px;font-weight:600;
+}
+.door.locked .door-date-label{color:rgba(100,100,140,0.3);}
+
+/* Ribbon decoration on front */
+.door-front::before{
+  content:'';position:absolute;
+  top:-1px;left:50%;transform:translateX(-50%);
+  width:2px;height:100%;
+  background:linear-gradient(to bottom,transparent,rgba(200,16,46,0.3),transparent);
+}
+.door-front::after{
+  content:'';position:absolute;
+  top:50%;left:-1px;transform:translateY(-50%);
+  width:100%;height:2px;
+  background:linear-gradient(to right,transparent,rgba(200,16,46,0.3),transparent);
+}
+.door.locked .door-front::before,.door.locked .door-front::after{opacity:0.2;}
+
+/* Pulsing available glow */
+.door:not(.locked):not(.opened) .door-front{
+  animation:door-pulse 2.5s ease-in-out infinite;
+}
+@keyframes door-pulse{
+  0%,100%{box-shadow:0 4px 20px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05);}
+  50%{box-shadow:0 4px 25px rgba(200,16,46,0.25),0 0 0 1px rgba(200,16,46,0.1),inset 0 1px 0 rgba(255,255,255,0.08);}
+}
+
+/* BACK – the revealed sports person */
+.door-back{
+  transform:rotateY(180deg);
+  background:#0d0d18;
+  border:1px solid rgba(255,215,0,0.2);
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 30px rgba(0,0,0,0.6);
+}
+.door-back img{
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:top center;
+}
+
+/* Completed / correct overlay */
+.door.correct .door-back{border-color:rgba(76,175,80,0.6);box-shadow:0 0 20px rgba(76,175,80,0.3);}
+.door.wrong .door-back{border-color:rgba(200,16,46,0.6);box-shadow:0 0 20px rgba(200,16,46,0.3);}
+
+/* Star badge for correct */
+.door-result-badge{
+  position:absolute;top:6px;right:6px;z-index:10;
+  font-size:1rem;
+  background:rgba(0,0,0,0.7);border-radius:50%;
+  width:26px;height:26px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,0.15);
+  opacity:0;transform:scale(0);transition:opacity 0.3s,transform 0.3s;
+}
+.door.correct .door-result-badge,.door.wrong .door-result-badge{opacity:1;transform:scale(1);}
+
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.88);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s ease;
+}
+.modal-overlay.active{opacity:1;pointer-events:all;}
+
+/* ===== MODAL CARD ===== */
+.modal-card{
+  background:linear-gradient(160deg,#12121e 0%,#1a0a12 100%);
+  border:1px solid rgba(255,215,0,0.15);
+  border-radius:24px;
+  width:100%;max-width:500px;
+  overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.04);
+  transform:scale(0.92) translateY(20px);
+  transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.modal-overlay.active .modal-card{transform:scale(1) translateY(0);}
+
+/* Image panel */
+.modal-image-wrap{
+  position:relative;
+  width:100%;
+  padding-top:70%;
+  overflow:hidden;
+  background:#0a0a14;
+}
+.modal-image-wrap img{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:top center;
+}
+/* Vignette overlay */
+.modal-image-wrap::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 50%,rgba(18,12,30,0.95) 100%);
+}
+
+/* Day label inside image */
+.modal-day-label{
+  position:absolute;top:12px;left:12px;z-index:2;
+  background:rgba(200,16,46,0.9);
+  color:#fff;font-weight:700;font-size:12px;letter-spacing:2px;
+  padding:4px 12px;border-radius:100px;text-transform:uppercase;
+}
+
+/* Blur class for image reveal */
+.modal-image-wrap img.blurred{filter:blur(20px) brightness(0.7);transition:filter 0.5s ease;}
+.modal-image-wrap img.revealed{filter:blur(0) brightness(1);transition:filter 0.8s ease;}
+
+/* Timer ring */
+.timer-wrap{
+  position:absolute;bottom:-24px;right:16px;z-index:10;
+  width:56px;height:56px;
+}
+.timer-ring{
+  transform:rotate(-90deg);
+  width:56px;height:56px;
+}
+.timer-ring-bg{fill:none;stroke:rgba(255,255,255,0.1);stroke-width:5;}
+.timer-ring-prog{
+  fill:none;stroke:#ffd700;stroke-width:5;
+  stroke-linecap:round;
+  stroke-dasharray:142;
+  stroke-dashoffset:0;
+  transition:stroke-dashoffset 1s linear,stroke 0.3s;
+}
+.timer-number{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:800;color:#ffd700;
+  transform:none;
+}
+
+/* Modal body */
+.modal-body{padding:36px 24px 28px;}
+.modal-sport-tag{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(255,215,0,0.6);font-weight:600;margin-bottom:10px;
+}
+.modal-question{
+  font-size:clamp(1rem,3vw,1.25rem);font-weight:700;
+  color:#fff;margin-bottom:22px;line-height:1.4;
+}
+.modal-question em{color:#ffd700;font-style:normal;}
+
+/* Answer buttons */
+.choices{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.choice-btn{
+  width:100%;padding:14px 20px;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  background:rgba(255,255,255,0.04);
+  color:#fff;font-family:'Outfit',sans-serif;
+  font-size:0.95rem;font-weight:600;
+  text-align:left;cursor:pointer;
+  transition:all 0.2s ease;
+  display:flex;align-items:center;gap:12px;
+  position:relative;overflow:hidden;
+}
+.choice-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,215,0,0.05),transparent);
+  opacity:0;transition:opacity 0.2s;
+}
+.choice-btn:hover::before{opacity:1;}
+.choice-btn:hover{
+  border-color:rgba(255,215,0,0.4);
+  background:rgba(255,215,0,0.06);
+  transform:translateX(4px);
+}
+.choice-btn:active{transform:translateX(2px);}
+.choice-btn.correct{
+  border-color:#4caf50!important;
+  background:rgba(76,175,80,0.15)!important;
+  color:#81c784;
+}
+.choice-btn.wrong{
+  border-color:#c8102e!important;
+  background:rgba(200,16,46,0.12)!important;
+  color:#ef9a9a;
+}
+.choice-btn:disabled{cursor:default;transform:none!important;}
+.choice-letter{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:800;letter-spacing:0;
+  flex-shrink:0;
+  border:1px solid rgba(255,255,255,0.12);
+  transition:all 0.2s;
+}
+.choice-btn.correct .choice-letter{background:rgba(76,175,80,0.3);border-color:#4caf50;}
+.choice-btn.wrong .choice-letter{background:rgba(200,16,46,0.3);border-color:#c8102e;}
+
+/* Feedback banner */
+.feedback-banner{
+  border-radius:12px;padding:14px 18px;
+  font-weight:700;font-size:1rem;
+  text-align:center;
+  opacity:0;transform:translateY(6px);
+  transition:opacity 0.3s,transform 0.3s;
+  margin-bottom:16px;
+  display:none;
+}
+.feedback-banner.show{opacity:1;transform:translateY(0);}
+.feedback-banner.correct{
+  display:block;
+  background:linear-gradient(135deg,rgba(76,175,80,0.2),rgba(76,175,80,0.05));
+  border:1px solid rgba(76,175,80,0.4);
+  color:#81c784;
+}
+.feedback-banner.wrong{
+  display:block;
+  background:linear-gradient(135deg,rgba(200,16,46,0.2),rgba(200,16,46,0.05));
+  border:1px solid rgba(200,16,46,0.4);
+  color:#ef9a9a;
+}
+.feedback-banner.timeout{
+  display:block;
+  background:linear-gradient(135deg,rgba(255,152,0,0.2),rgba(255,152,0,0.05));
+  border:1px solid rgba(255,152,0,0.4);
+  color:#ffb74d;
+}
+
+/* Next/close button */
+.modal-next-btn{
+  width:100%;padding:14px;
+  border:none;border-radius:12px;
+  background:linear-gradient(135deg,#c8102e,#8b0000);
+  color:#fff;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  letter-spacing:0.5px;
+  box-shadow:0 4px 15px rgba(200,16,46,0.3);
+  display:none;
+}
+.modal-next-btn.show{display:block;}
+.modal-next-btn:hover{background:linear-gradient(135deg,#e01535,#a0000a);box-shadow:0 6px 20px rgba(200,16,46,0.4);transform:translateY(-1px);}
+
+/* ===== RESULT MODAL ===== */
+.result-modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.92);
+  backdrop-filter:blur(12px);
+  z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.4s;
+}
+.result-modal.active{opacity:1;pointer-events:all;}
+.result-card{
+  background:linear-gradient(160deg,#12121e,#1a0a12);
+  border:1px solid rgba(255,215,0,0.2);
+  border-radius:24px;
+  padding:40px 32px;
+  text-align:center;
+  max-width:420px;width:100%;
+  transform:scale(0.9);
+  transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow:0 40px 100px rgba(0,0,0,0.8);
+}
+.result-modal.active .result-card{transform:scale(1);}
+.result-trophy{font-size:4rem;margin-bottom:12px;display:block;}
+.result-title{
+  font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;
+  background:linear-gradient(135deg,#fff,#ffd700);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;
+}
+.result-score-big{
+  font-size:3.5rem;font-weight:900;color:#ffd700;
+  margin:16px 0;line-height:1;
+}
+.result-meta{color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:24px;}
+.result-streak{
+  display:inline-block;
+  background:rgba(255,152,0,0.15);border:1px solid rgba(255,152,0,0.3);
+  color:#ffb74d;font-weight:700;font-size:0.85rem;
+  padding:6px 16px;border-radius:100px;margin-bottom:24px;
+}
+.result-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn-primary{
+  padding:12px 28px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#c8102e,#8b0000);
+  color:#fff;font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:700;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 15px rgba(200,16,46,0.3);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(200,16,46,0.4);}
+.btn-secondary{
+  padding:12px 28px;border:1px solid rgba(255,255,255,0.15);border-radius:12px;
+  background:rgba(255,255,255,0.05);
+  color:#fff;font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-secondary:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px);}
+
+/* ===== FOOTER ===== */
+footer{
+  text-align:center;padding:20px;
+  font-size:11px;color:rgba(255,255,255,0.2);
+  letter-spacing:1px;text-transform:uppercase;
+  border-top:1px solid rgba(255,255,255,0.04);
+}
+footer span{color:rgba(255,255,255,0.35);}
+
+/* ===== INTRO SPLASH ===== */
+.splash{
+  position:fixed;inset:0;z-index:999;
+  background:#07070f;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:24px;
+  transition:opacity 0.6s ease,transform 0.6s ease;
+}
+.splash.hidden{opacity:0;pointer-events:none;transform:scale(1.04);}
+.splash-icon{font-size:4rem;margin-bottom:16px;animation:bounce 1.5s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.splash h2{
+  font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:900;
+  background:linear-gradient(135deg,#fff 0%,#ffd700 50%,#ff6b35 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:12px;
+}
+.splash p{
+  color:rgba(255,255,255,0.5);font-size:clamp(0.85rem,2vw,1rem);
+  max-width:400px;margin:0 auto 28px;line-height:1.6;
+}
+.splash-rules{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:20px 24px;max-width:380px;margin:0 auto 28px;
+  text-align:left;
+}
+.splash-rules li{
+  color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:10px;
+  padding-left:24px;position:relative;list-style:none;
+}
+.splash-rules li::before{content:attr(data-icon);position:absolute;left:0;}
+.splash-start-btn{
+  padding:16px 48px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,#c8102e,#8b0000);
+  color:#fff;font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;
+  cursor:pointer;transition:all 0.25s;
+  box-shadow:0 8px 30px rgba(200,16,46,0.4);
+  letter-spacing:0.5px;
+}
+.splash-start-btn:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(200,16,46,0.5);}
+
+/* ===== CONFETTI PARTICLES ===== */
+.confetti-piece{
+  position:fixed;
+  width:8px;height:8px;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:500;
+  animation:confetti-fall 1.2s ease-in forwards;
+}
+@keyframes confetti-fall{
+  0%{transform:translate(0,0) rotate(0deg);opacity:1;}
+  100%{transform:translate(var(--tx),200px) rotate(720deg);opacity:0;}
+}
+
+/* ===== STREAK FLASH ===== */
+.streak-flash{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:300;pointer-events:none;
+  font-size:2rem;font-weight:900;color:#ffd700;
+  text-shadow:0 0 30px rgba(255,215,0,0.8);
+  animation:streak-pop 1s ease forwards;
+}
+@keyframes streak-pop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}
+  30%{opacity:1;transform:translate(-50%,-60%) scale(1.2);}
+  70%{opacity:1;transform:translate(-50%,-70%) scale(1);}
+  100%{opacity:0;transform:translate(-50%,-90%) scale(0.8);}
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-section{
+  text-align:center;padding:0 20px 20px;
+}
+.progress-bar-wrap{
+  background:rgba(255,255,255,0.05);
+  border-radius:100px;height:6px;
+  max-width:500px;margin:0 auto 8px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.progress-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,#c8102e,#ffd700);
+  border-radius:100px;
+  transition:width 0.5s ease;
+}
+.progress-text{font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase;}
+
+/* Shimmer effect on locked doors */
+@keyframes shimmer{
+  0%{background-position:-200% 0;}
+  100%{background-position:200% 0;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="snow-canvas"></canvas>
+<div class="bg-gradient"></div>
+
+<!-- INTRO SPLASH -->
+<div class="splash" id="splash">
+  <div class="splash-icon">🎅</div>
+  <h2>Sports Santa Quiz</h2>
+  <p>25 legendary athletes. 25 festive disguises. Can you name them all before the clock runs out?</p>
+  <ul class="splash-rules">
+    <li data-icon="📅">Open a door each day of the Advent Calendar</li>
+    <li data-icon="📸">A sports star in disguise will be revealed</li>
+    <li data-icon="⏱️">You have just <strong style="color:#ffd700">5 seconds</strong> to pick the right answer</li>
+    <li data-icon="🏆">Score points for correct answers &amp; build streaks</li>
+    <li data-icon="🎁">All 25 doors are unlocked for this demo</li>
+  </ul>
+  <button class="splash-start-btn" id="splash-start" onclick="startGame()">Open the Calendar 🎄</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header>
+    <div class="brand-badge">⚽ Free to Play · Sports Santa Quiz 🎄</div>
+    <h1>Sports <span>Santa</span> Quiz</h1>
+    <p class="tagline">Guess the legend behind the beard &amp; hat</p>
+    <div class="snowflake-row">❄️ ⭐ ❄️ ⭐ ❄️</div>
+  </header>
+
+  <div class="scoreboard">
+    <div class="score-card">
+      <div class="score-label">Score</div>
+      <div class="score-value" id="sc-score">0</div>
+    </div>
+    <div class="score-card">
+      <div class="score-label">Correct</div>
+      <div class="score-value green" id="sc-correct">0</div>
+    </div>
+    <div class="score-card">
+      <div class="score-label">Wrong</div>
+      <div class="score-value red" id="sc-wrong">0</div>
+    </div>
+    <div class="score-card">
+      <div class="score-label">🔥 Streak</div>
+      <div class="score-value streak" id="sc-streak">0</div>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="progress-text">0 / 25 doors opened</div>
+  </div>
+
+  <div class="calendar-container">
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
+
+  <footer>
+    <span>Sports Santa Quiz</span> · Free to Play · Prototype Demo · For Licencing Enquiries Contact Us
+  </footer>
+</div>
+
+<!-- QUESTION MODAL -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-image-wrap" id="modal-img-wrap">
+      <div class="modal-day-label" id="modal-day-lbl">Day 1</div>
+      <img id="modal-img" src="" alt="Mystery sports person in Christmas outfit"/>
+      <div class="timer-wrap">
+        <svg class="timer-ring" viewBox="0 0 56 56">
+          <circle class="timer-ring-bg" cx="28" cy="28" r="22.5"/>
+          <circle class="timer-ring-prog" id="timer-prog" cx="28" cy="28" r="22.5"/>
+        </svg>
+        <div class="timer-number" id="timer-num">5</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-sport-tag" id="modal-sport-tag">🎄 Day 1 · Sport</div>
+      <p class="modal-question" id="modal-question">Who is the <em>mystery sports star</em> hiding behind the Santa disguise?</p>
+      <div class="choices" id="choices"></div>
+      <div class="feedback-banner" id="feedback-banner"></div>
+      <button class="modal-next-btn" id="modal-next-btn">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALL-DONE RESULT MODAL -->
+<div class="result-modal" id="result-modal">
+  <div class="result-card">
+    <span class="result-trophy" id="result-trophy">🏆</span>
+    <div class="result-title" id="result-title">Festive Legend!</div>
+    <div class="result-score-big" id="result-score-big">0 pts</div>
+    <div class="result-meta" id="result-meta">You got 0 / 25 correct</div>
+    <div class="result-streak" id="result-streak">Best Streak: 0 🔥</div>
+    <div class="result-actions">
+      <button class="btn-primary" onclick="resetGame()">Play Again 🎄</button>
+      <button class="btn-secondary" onclick="document.getElementById('result-modal').classList.remove('active')">Review Board</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================================================
+   GAME DATA – 25 days of sports puzzles
+   Images cycle through 8 generated photos
+   In production each day gets a unique real photo
+=================================================== */
+const IMAGES = {
+  boxer:      'img_boxer.png',
+  f1:         'img_f1.png',
+  golfer:     'img_golfer.png',
+  athlete:    'img_athlete.png',
+  rugby:      'img_rugby.png',
+  swimmer:    'img_swimmer.png',
+  basketball: 'img_basketball.png',
+  snooker:    'img_snooker.png',
+};
+
+const DAYS = [
+  { day:1,  img:'boxer',      sport:'Boxing 🥊',      correct:'Anthony Joshua',    wrong:['Tyson Fury','David Haye'],       hint:'British heavyweight world champion, Olympic gold medallist' },
+  { day:2,  img:'f1',         sport:'Formula 1 🏎️',   correct:'Lewis Hamilton',    wrong:['Max Verstappen','Nico Rosberg'], hint:'7-time Formula 1 world champion' },
+  { day:3,  img:'golfer',     sport:'Golf ⛳',         correct:'Rory McIlroy',      wrong:['Tiger Woods','Jon Rahm'],        hint:'Northern Irish golfer, 4 major titles' },
+  { day:4,  img:'athlete',    sport:'Athletics 🏃',    correct:'Usain Bolt',        wrong:['Mo Farah','Yohan Blake'],        hint:'The fastest man in history, triple Olympic champion' },
+  { day:5,  img:'rugby',      sport:'Rugby Union 🏉',  correct:'Jonny Wilkinson',   wrong:['Martin Johnson','Lawrence Dallaglio'], hint:'Drop-kicked England to World Cup glory in 2003' },
+  { day:6,  img:'swimmer',    sport:'Swimming 🏊',     correct:'Michael Phelps',    wrong:['Adam Peaty','Ian Thorpe'],       hint:'Most decorated Olympian of all time with 23 gold medals' },
+  { day:7,  img:'basketball', sport:'Basketball 🏀',   correct:'LeBron James',      wrong:['Michael Jordan','Kevin Durant'], hint:'The King – 4-time NBA champion' },
+  { day:8,  img:'snooker',    sport:'Snooker 🎱',      correct:'Ronnie O\'Sullivan', wrong:['Mark Selby','Judd Trump'],      hint:'The Rocket – 7-time World Snooker Champion' },
+  { day:9,  img:'f1',         sport:'Formula 1 🏎️',   correct:'Max Verstappen',    wrong:['Lewis Hamilton','Charles Leclerc'], hint:'Dutch sensation, youngest ever F1 champion' },
+  { day:10, img:'boxer',      sport:'Boxing 🥊',       correct:'Tyson Fury',        wrong:['Anthony Joshua','Oleksandr Usyk'], hint:'The Gypsy King – WBC heavyweight champion from Manchester' },
+  { day:11, img:'golfer',     sport:'Golf ⛳',         correct:'Tiger Woods',       wrong:['Rory McIlroy','Phil Mickelson'], hint:'15-time major champion who changed golf forever' },
+  { day:12, img:'athlete',    sport:'Athletics 🏃',    correct:'Mo Farah',          wrong:['Usain Bolt','Colin Jackson'],    hint:'British double Olympic champion at 5,000m and 10,000m' },
+  { day:13, img:'rugby',      sport:'Rugby Union 🏉',  correct:'Martin Johnson',    wrong:['Jonny Wilkinson','Will Carling'], hint:'England captain who lifted the Webb Ellis Cup in 2003' },
+  { day:14, img:'swimmer',    sport:'Swimming 🏊',     correct:'Adam Peaty',        wrong:['Michael Phelps','Tom Dean'],    hint:'British backstroke and breaststroke star, world record holder' },
+  { day:15, img:'basketball', sport:'Basketball 🏀',   correct:'Michael Jordan',    wrong:['LeBron James','Kobe Bryant'],   hint:'His Airness – 6 NBA titles, 6 Finals MVPs' },
+  { day:16, img:'snooker',    sport:'Snooker 🎱',      correct:'Judd Trump',        wrong:['Ronnie O\'Sullivan','Neil Robertson'], hint:'Bristol-born world champion known for his attacking play' },
+  { day:17, img:'boxer',      sport:'Boxing 🥊',       correct:'David Haye',        wrong:['Tyson Fury','Lennox Lewis'],    hint:'The Hayemaker – unified cruiserweight and WBA heavyweight world champion' },
+  { day:18, img:'f1',         sport:'Formula 1 🏎️',   correct:'Sebastian Vettel',  wrong:['Max Verstappen','Kimi Räikkönen'], hint:'4-time consecutive world champion with Red Bull Racing' },
+  { day:19, img:'golfer',     sport:'Golf ⛳',         correct:'Phil Mickelson',    wrong:['Tiger Woods','Dustin Johnson'], hint:'Lefty – 6 major championships including 3 Masters titles' },
+  { day:20, img:'athlete',    sport:'Athletics 🏃',    correct:'Colin Jackson',     wrong:['Mo Farah','Linford Christie'], hint:'Welsh sprinter and world record holder in 110m hurdles' },
+  { day:21, img:'rugby',      sport:'Rugby Union 🏉',  correct:'Brian O\'Driscoll', wrong:['Martin Johnson','Paul O\'Connell'], hint:'Ireland\'s greatest ever player, British Lions legend' },
+  { day:22, img:'swimmer',    sport:'Swimming 🏊',     correct:'Ian Thorpe',        wrong:['Michael Phelps','Grant Hackett'], hint:'The Thorpedo – Australian 5-time Olympic gold medallist' },
+  { day:23, img:'basketball', sport:'Basketball 🏀',   correct:'Stephen Curry',     wrong:['LeBron James','Kevin Durant'],  hint:'Golden State sharpshooter who revolutionised the three-point shot' },
+  { day:24, img:'snooker',    sport:'Snooker 🎱',      correct:'Mark Selby',        wrong:['Ronnie O\'Sullivan','John Higgins'], hint:'The Jester from Leicester – 4-time World Snooker Champion' },
+  { day:25, img:'boxer',      sport:'Boxing 🥊',       correct:'Lennox Lewis',      wrong:['Evander Holyfield','Riddick Bowe'], hint:'British-Canadian legend – undisputed heavyweight champion of the world' },
+];
+
+/* Shuffle wrong answers for randomness */
+function buildChoices(d) {
+  const opts = [d.correct, ...d.wrong];
+  return opts.sort(() => Math.random() - 0.5);
+}
+
+/* ===== STATE ===== */
+let state = {
+  score: 0,
+  correct: 0,
+  wrong: 0,
+  streak: 0,
+  bestStreak: 0,
+  opened: new Set(),
+  results: {}, // day -> 'correct'|'wrong'|'timeout'
+  timerInterval: null,
+  timerSecs: 5,
+  currentDay: null,
+  currentChoices: null,
+  answered: false,
+};
+
+/* ===== SNOW ===== */
+(function initSnow() {
+  const canvas = document.getElementById('snow-canvas');
+  const ctx = canvas.getContext('2d');
+  let flakes = [];
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 80; i++) {
+    flakes.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 3 + 1,
+      speed: Math.random() * 0.8 + 0.3,
+      drift: Math.random() * 0.5 - 0.25,
+      opacity: Math.random() * 0.5 + 0.1,
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    flakes.forEach(f => {
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${f.opacity})`;
+      ctx.fill();
+      f.y += f.speed;
+      f.x += f.drift;
+      if (f.y > canvas.height) { f.y = -5; f.x = Math.random() * canvas.width; }
+      if (f.x > canvas.width) f.x = 0;
+      if (f.x < 0) f.x = canvas.width;
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ===== BUILD GRID ===== */
+function buildGrid() {
+  const grid = document.getElementById('calendar-grid');
+  grid.innerHTML = '';
+  const EMOJIS = ['⛄','🎅','🦌','🎁','⭐','🍪','🔔','🕯️','🎶','❄️','🎿','🛷','🌟','🧤','🧣','🎄','🍾','🥂','🎊','🎉','🦌','⛄','🎅','🎁','🌟'];
+
+  DAYS.forEach((d, i) => {
+    const isLocked = false; // All unlocked for demo — in production: d.day > TODAY
+    const isOpened = state.opened.has(d.day);
+    const result = state.results[d.day];
+
+    const door = document.createElement('div');
+    door.className = 'door' + (isLocked ? ' locked' : '') + (isOpened ? ' opened flipped' : '') + (result === 'correct' ? ' correct' : result ? ' wrong' : '');
+    door.id = `door-${d.day}`;
+    door.setAttribute('data-day', d.day);
+    door.setAttribute('aria-label', `Day ${d.day}${isLocked ? ' – locked' : ''}`);
+    if (!isLocked && !isOpened) door.addEventListener('click', () => openDoor(d.day));
+
+    door.innerHTML = `
+      <div class="door-inner">
+        <div class="door-front">
+          <div class="door-number">${d.day}</div>
+          <div class="door-emoji">${EMOJIS[i]}</div>
+          <div class="door-date-label">Dec ${d.day}</div>
+        </div>
+        <div class="door-back">
+          <img src="${IMAGES[d.img]}" alt="Sports person day ${d.day}" loading="lazy"/>
+        </div>
+      </div>
+      <div class="door-result-badge">${result === 'correct' ? '✅' : result ? '❌' : ''}</div>
+    `;
+    grid.appendChild(door);
+  });
+
+  updateScoreboard();
+  updateProgress();
+}
+
+/* ===== OPEN DOOR ===== */
+function openDoor(dayNum) {
+  if (state.opened.has(dayNum)) return;
+  const d = DAYS.find(x => x.day === dayNum);
+  if (!d) return;
+
+  state.currentDay = dayNum;
+  state.answered = false;
+  state.currentChoices = buildChoices(d);
+
+  // Flip the card
+  const doorEl = document.getElementById(`door-${dayNum}`);
+  doorEl.classList.add('flipped');
+
+  // Short delay then show modal
+  setTimeout(() => showModal(d), 400);
+}
+
+/* ===== SHOW MODAL ===== */
+function showModal(d) {
+  const overlay = document.getElementById('modal-overlay');
+  const img = document.getElementById('modal-img');
+  const dayLbl = document.getElementById('modal-day-lbl');
+  const sportTag = document.getElementById('modal-sport-tag');
+  const question = document.getElementById('modal-question');
+  const choicesDiv = document.getElementById('choices');
+  const feedbackBanner = document.getElementById('feedback-banner');
+  const nextBtn = document.getElementById('modal-next-btn');
+
+  // Reset UI
+  img.className = 'blurred';
+  feedbackBanner.className = 'feedback-banner';
+  feedbackBanner.textContent = '';
+  nextBtn.className = 'modal-next-btn';
+  choicesDiv.innerHTML = '';
+
+  // Populate
+  img.src = IMAGES[d.img];
+  dayLbl.textContent = `Day ${d.day}`;
+  sportTag.textContent = `🎄 Day ${d.day} · ${d.sport}`;
+  question.innerHTML = `Who is the <em>mystery sports star</em> hiding behind the Santa disguise?`;
+
+  const letters = ['A','B','C'];
+  state.currentChoices.forEach((name, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.id = `choice-${idx}`;
+    btn.innerHTML = `<span class="choice-letter">${letters[idx]}</span>${name}`;
+    btn.addEventListener('click', () => answerChoice(name, d));
+    choicesDiv.appendChild(btn);
+  });
+
+  overlay.classList.add('active');
+
+  // Reveal image after 0.6s
+  setTimeout(() => { img.className = 'revealed'; }, 600);
+
+  // Start timer
+  startTimer(d);
+}
+
+/* ===== TIMER ===== */
+function startTimer(d) {
+  clearInterval(state.timerInterval);
+  state.timerSecs = 5;
+  const numEl = document.getElementById('timer-num');
+  const progEl = document.getElementById('timer-prog');
+  const CIRCUMFERENCE = 2 * Math.PI * 22.5; // r=22.5
+
+  numEl.textContent = state.timerSecs;
+  progEl.style.strokeDashoffset = 0;
+  progEl.style.stroke = '#ffd700';
+
+  state.timerInterval = setInterval(() => {
+    state.timerSecs--;
+    numEl.textContent = state.timerSecs;
+    const fraction = state.timerSecs / 5;
+    progEl.style.strokeDashoffset = CIRCUMFERENCE * (1 - fraction);
+
+    if (state.timerSecs <= 2) progEl.style.stroke = '#c8102e';
+    else if (state.timerSecs <= 3) progEl.style.stroke = '#ff9800';
+
+    if (state.timerSecs <= 0) {
+      clearInterval(state.timerInterval);
+      if (!state.answered) handleTimeout(d);
+    }
+  }, 1000);
+}
+
+/* ===== ANSWER ===== */
+function answerChoice(name, d) {
+  if (state.answered) return;
+  state.answered = true;
+  clearInterval(state.timerInterval);
+
+  const isCorrect = name === d.correct;
+  highlightChoices(d.correct, name);
+
+  if (isCorrect) {
+    handleCorrect(d);
+  } else {
+    handleWrong(d);
+  }
+  showNextBtn();
+}
+
+function handleCorrect(d) {
+  const bonus = state.timerSecs >= 4 ? 150 : state.timerSecs >= 3 ? 120 : 100;
+  state.score += bonus;
+  state.correct++;
+  state.streak++;
+  if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+  state.opened.add(d.day);
+  state.results[d.day] = 'correct';
+
+  showFeedback('correct', `✅ Correct! +${bonus} points${state.streak > 1 ? ` · 🔥 ${state.streak} streak!` : ''}\n${d.hint}`);
+  spawnConfetti();
+  if (state.streak > 1) showStreakFlash(state.streak);
+  updateDoorResult(d.day, 'correct');
+  updateScoreboard();
+  updateProgress();
+}
+
+function handleWrong(d) {
+  state.wrong++;
+  state.streak = 0;
+  state.opened.add(d.day);
+  state.results[d.day] = 'wrong';
+
+  showFeedback('wrong', `❌ Bad luck! It was ${d.correct}.\n${d.hint}`);
+  updateDoorResult(d.day, 'wrong');
+  updateScoreboard();
+  updateProgress();
+}
+
+function handleTimeout(d) {
+  state.answered = true;
+  state.wrong++;
+  state.streak = 0;
+  state.opened.add(d.day);
+  state.results[d.day] = 'timeout';
+
+  highlightChoices(d.correct, null);
+  showFeedback('timeout', `⏰ Time's up! It was ${d.correct}.\n${d.hint}`);
+  updateDoorResult(d.day, 'wrong');
+  updateScoreboard();
+  updateProgress();
+  showNextBtn();
+}
+
+/* ===== UI HELPERS ===== */
+function highlightChoices(correct, selected) {
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(btn => {
+    btn.disabled = true;
+    const name = btn.textContent.slice(1).trim(); // remove letter
+    if (name === correct) {
+      btn.classList.add('correct');
+      btn.querySelector('.choice-letter').textContent = '✓';
+    } else if (selected && name === selected) {
+      btn.classList.add('wrong');
+      btn.querySelector('.choice-letter').textContent = '✗';
+    }
+  });
+}
+
+function showFeedback(type, msg) {
+  const fb = document.getElementById('feedback-banner');
+  fb.className = `feedback-banner ${type}`;
+  fb.innerHTML = msg.replace('\n', '<br/><span style="font-size:0.8rem;opacity:0.8;font-weight:400">') + '</span>';
+  requestAnimationFrame(() => fb.classList.add('show'));
+}
+
+function showNextBtn() {
+  const btn = document.getElementById('modal-next-btn');
+  btn.className = 'modal-next-btn show';
+  btn.onclick = closeModal;
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.remove('active');
+  clearInterval(state.timerInterval);
+
+  // Check if all 25 done
+  setTimeout(() => {
+    if (state.opened.size === 25) showResults();
+  }, 400);
+}
+
+function updateDoorResult(dayNum, result) {
+  const door = document.getElementById(`door-${dayNum}`);
+  if (!door) return;
+  door.classList.add(result);
+  door.classList.add('opened');
+  const badge = door.querySelector('.door-result-badge');
+  if (badge) badge.textContent = result === 'correct' ? '✅' : '❌';
+}
+
+function updateScoreboard() {
+  document.getElementById('sc-score').textContent = state.score.toLocaleString();
+  document.getElementById('sc-correct').textContent = state.correct;
+  document.getElementById('sc-wrong').textContent = state.wrong;
+  document.getElementById('sc-streak').textContent = state.streak;
+}
+
+function updateProgress() {
+  const pct = (state.opened.size / 25) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${state.opened.size} / 25 doors opened`;
+}
+
+/* ===== CONFETTI ===== */
+function spawnConfetti() {
+  const colors = ['#ffd700','#c8102e','#ffffff','#4caf50','#ff9800','#e91e63'];
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left:${30 + Math.random()*40}%;
+      top:${20 + Math.random()*30}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      --tx:${(Math.random()-0.5)*200}px;
+      animation-delay:${Math.random()*0.3}s;
+      animation-duration:${0.9+Math.random()*0.6}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+  }
+}
+
+/* ===== STREAK FLASH ===== */
+function showStreakFlash(n) {
+  const el = document.createElement('div');
+  el.className = 'streak-flash';
+  el.textContent = `🔥 ${n}x STREAK!`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+/* ===== RESULTS MODAL ===== */
+function showResults() {
+  const pct = Math.round((state.correct / 25) * 100);
+  let trophy = '🎅'; let title = 'Festive Beginner';
+  if (pct >= 96) { trophy = '🏆'; title = 'Sports Genius!'; }
+  else if (pct >= 80) { trophy = '🥇'; title = 'Festive Legend!'; }
+  else if (pct >= 60) { trophy = '🥈'; title = 'Sports Santa Fan!'; }
+  else if (pct >= 40) { trophy = '🥉'; title = 'Good Effort!'; }
+
+  document.getElementById('result-trophy').textContent = trophy;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-score-big').textContent = state.score.toLocaleString() + ' pts';
+  document.getElementById('result-meta').textContent = `You got ${state.correct} out of 25 correct (${pct}%)`;
+  document.getElementById('result-streak').textContent = `Best Streak: ${state.bestStreak} 🔥`;
+  document.getElementById('result-modal').classList.add('active');
+}
+
+/* ===== RESET ===== */
+function resetGame() {
+  clearInterval(state.timerInterval);
+  state = {
+    score:0,correct:0,wrong:0,streak:0,bestStreak:0,
+    opened:new Set(),results:{},
+    timerInterval:null,timerSecs:5,
+    currentDay:null,currentChoices:null,answered:false,
+  };
+  document.getElementById('result-modal').classList.remove('active');
+  buildGrid();
+}
+
+/* ===== START ===== */
+function startGame() {
+  document.getElementById('splash').classList.add('hidden');
+  buildGrid();
+}
+</script>
+</body>
+</html>
