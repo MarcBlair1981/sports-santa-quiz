@@ -26,7 +26,7 @@ const DAYS = [
   // ── DAY 1 ──────────────────────────────────────────────────
   {
     day:     1,
-    img:     'img_boxer.png',        // 👈 swap for your own file e.g. 'anthony_joshua.jpg'
+    img:     'images/img_boxer.png',        // 👈 swap for your own file e.g. 'anthony_joshua.jpg'
     sport:   'Boxing 🥊',
     correct: 'Anthony Joshua',       // 👈 the right answer
     wrong:   ['Tyson Fury',          // 👈 two wrong answers (order doesn't matter)
@@ -37,7 +37,7 @@ const DAYS = [
   // ── DAY 2 ──────────────────────────────────────────────────
   {
     day:     2,
-    img:     'img_f1.png',
+    img:     'images/img_f1.png',
     sport:   'Formula 1 🏎️',
     correct: 'Lewis Hamilton',
     wrong:   ['Max Verstappen', 'Nico Rosberg'],
@@ -47,7 +47,7 @@ const DAYS = [
   // ── DAY 3 ──────────────────────────────────────────────────
   {
     day:     3,
-    img:     'img_golfer.png',
+    img:     'images/img_golfer.png',
     sport:   'Golf ⛳',
     correct: 'Rory McIlroy',
     wrong:   ['Tiger Woods', 'Jon Rahm'],
@@ -57,7 +57,7 @@ const DAYS = [
   // ── DAY 4 ──────────────────────────────────────────────────
   {
     day:     4,
-    img:     'img_athlete.png',
+    img:     'images/img_athlete.png',
     sport:   'Athletics 🏃',
     correct: 'Usain Bolt',
     wrong:   ['Mo Farah', 'Yohan Blake'],
@@ -67,7 +67,7 @@ const DAYS = [
   // ── DAY 5 ──────────────────────────────────────────────────
   {
     day:     5,
-    img:     'img_rugby.png',
+    img:     'images/img_rugby.png',
     sport:   'Rugby Union 🏉',
     correct: 'Jonny Wilkinson',
     wrong:   ['Martin Johnson', 'Lawrence Dallaglio'],
@@ -77,7 +77,7 @@ const DAYS = [
   // ── DAY 6 ──────────────────────────────────────────────────
   {
     day:     6,
-    img:     'img_swimmer.png',
+    img:     'images/img_swimmer.png',
     sport:   'Swimming 🏊',
     correct: 'Michael Phelps',
     wrong:   ['Adam Peaty', 'Ian Thorpe'],
@@ -87,7 +87,7 @@ const DAYS = [
   // ── DAY 7 ──────────────────────────────────────────────────
   {
     day:     7,
-    img:     'img_basketball.png',
+    img:     'images/img_basketball.png',
     sport:   'Basketball 🏀',
     correct: 'LeBron James',
     wrong:   ['Michael Jordan', 'Kevin Durant'],
@@ -97,7 +97,7 @@ const DAYS = [
   // ── DAY 8 ──────────────────────────────────────────────────
   {
     day:     8,
-    img:     'img_snooker.png',
+    img:     'images/img_snooker.png',
     sport:   'Snooker 🎱',
     correct: "Ronnie O'Sullivan",
     wrong:   ['Mark Selby', 'Judd Trump'],
@@ -107,7 +107,7 @@ const DAYS = [
   // ── DAY 9 ──────────────────────────────────────────────────
   {
     day:     9,
-    img:     'img_f1.png',
+    img:     'images/img_f1.png',
     sport:   'Formula 1 🏎️',
     correct: 'Max Verstappen',
     wrong:   ['Lewis Hamilton', 'Charles Leclerc'],
@@ -117,7 +117,7 @@ const DAYS = [
   // ── DAY 10 ─────────────────────────────────────────────────
   {
     day:     10,
-    img:     'img_boxer.png',
+    img:     'images/img_boxer.png',
     sport:   'Boxing 🥊',
     correct: 'Tyson Fury',
     wrong:   ['Anthony Joshua', 'Oleksandr Usyk'],
@@ -127,7 +127,7 @@ const DAYS = [
   // ── DAY 11 ─────────────────────────────────────────────────
   {
     day:     11,
-    img:     'img_golfer.png',
+    img:     'images/img_golfer.png',
     sport:   'Golf ⛳',
     correct: 'Tiger Woods',
     wrong:   ['Rory McIlroy', 'Phil Mickelson'],
@@ -137,7 +137,7 @@ const DAYS = [
   // ── DAY 12 ─────────────────────────────────────────────────
   {
     day:     12,
-    img:     'img_athlete.png',
+    img:     'images/img_athlete.png',
     sport:   'Athletics 🏃',
     correct: 'Mo Farah',
     wrong:   ['Usain Bolt', 'Colin Jackson'],
@@ -147,7 +147,7 @@ const DAYS = [
   // ── DAY 13 ─────────────────────────────────────────────────
   {
     day:     13,
-    img:     'img_rugby.png',
+    img:     'images/img_rugby.png',
     sport:   'Rugby Union 🏉',
     correct: 'Martin Johnson',
     wrong:   ['Jonny Wilkinson', 'Will Carling'],
@@ -157,7 +157,7 @@ const DAYS = [
   // ── DAY 14 ─────────────────────────────────────────────────
   {
     day:     14,
-    img:     'img_swimmer.png',
+    img:     'images/img_swimmer.png',
     sport:   'Swimming 🏊',
     correct: 'Adam Peaty',
     wrong:   ['Michael Phelps', 'Tom Dean'],
@@ -167,7 +167,7 @@ const DAYS = [
   // ── DAY 15 ─────────────────────────────────────────────────
   {
     day:     15,
-    img:     'img_basketball.png',
+    img:     'images/img_basketball.png',
     sport:   'Basketball 🏀',
     correct: 'Michael Jordan',
     wrong:   ['LeBron James', 'Kobe Bryant'],
@@ -177,7 +177,7 @@ const DAYS = [
   // ── DAY 16 ─────────────────────────────────────────────────
   {
     day:     16,
-    img:     'img_snooker.png',
+    img:     'images/img_snooker.png',
     sport:   'Snooker 🎱',
     correct: 'Judd Trump',
     wrong:   ["Ronnie O'Sullivan", 'Neil Robertson'],
@@ -187,7 +187,7 @@ const DAYS = [
   // ── DAY 17 ─────────────────────────────────────────────────
   {
     day:     17,
-    img:     'img_boxer.png',
+    img:     'images/img_boxer.png',
     sport:   'Boxing 🥊',
     correct: 'David Haye',
     wrong:   ['Tyson Fury', 'Lennox Lewis'],
@@ -197,7 +197,7 @@ const DAYS = [
   // ── DAY 18 ─────────────────────────────────────────────────
   {
     day:     18,
-    img:     'img_f1.png',
+    img:     'images/img_f1.png',
     sport:   'Formula 1 🏎️',
     correct: 'Sebastian Vettel',
     wrong:   ['Max Verstappen', 'Kimi Räikkönen'],
@@ -207,7 +207,7 @@ const DAYS = [
   // ── DAY 19 ─────────────────────────────────────────────────
   {
     day:     19,
-    img:     'img_golfer.png',
+    img:     'images/img_golfer.png',
     sport:   'Golf ⛳',
     correct: 'Phil Mickelson',
     wrong:   ['Tiger Woods', 'Dustin Johnson'],
@@ -217,7 +217,7 @@ const DAYS = [
   // ── DAY 20 ─────────────────────────────────────────────────
   {
     day:     20,
-    img:     'img_athlete.png',
+    img:     'images/img_athlete.png',
     sport:   'Athletics 🏃',
     correct: 'Colin Jackson',
     wrong:   ['Mo Farah', 'Linford Christie'],
@@ -227,7 +227,7 @@ const DAYS = [
   // ── DAY 21 ─────────────────────────────────────────────────
   {
     day:     21,
-    img:     'img_rugby.png',
+    img:     'images/img_rugby.png',
     sport:   'Rugby Union 🏉',
     correct: "Brian O'Driscoll",
     wrong:   ['Martin Johnson', "Paul O'Connell"],
@@ -237,7 +237,7 @@ const DAYS = [
   // ── DAY 22 ─────────────────────────────────────────────────
   {
     day:     22,
-    img:     'img_swimmer.png',
+    img:     'images/img_swimmer.png',
     sport:   'Swimming 🏊',
     correct: 'Ian Thorpe',
     wrong:   ['Michael Phelps', 'Grant Hackett'],
@@ -247,7 +247,7 @@ const DAYS = [
   // ── DAY 23 ─────────────────────────────────────────────────
   {
     day:     23,
-    img:     'img_basketball.png',
+    img:     'images/img_basketball.png',
     sport:   'Basketball 🏀',
     correct: 'Stephen Curry',
     wrong:   ['LeBron James', 'Kevin Durant'],
@@ -257,7 +257,7 @@ const DAYS = [
   // ── DAY 24 ─────────────────────────────────────────────────
   {
     day:     24,
-    img:     'img_snooker.png',
+    img:     'images/img_snooker.png',
     sport:   'Snooker 🎱',
     correct: 'Mark Selby',
     wrong:   ["Ronnie O'Sullivan", 'John Higgins'],
@@ -267,7 +267,7 @@ const DAYS = [
   // ── DAY 25 ─────────────────────────────────────────────────
   {
     day:     25,
-    img:     'img_boxer.png',
+    img:     'images/img_boxer.png',
     sport:   'Boxing 🥊',
     correct: 'Lennox Lewis',
     wrong:   ['Evander Holyfield', 'Riddick Bowe'],
